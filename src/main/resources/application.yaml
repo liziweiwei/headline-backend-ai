@@ -41,6 +41,7 @@ mybatis-plus:
   # 定义不同Java包的日志记录级别,输出简易日志信息
   # 如果mapper层出现了问题,由于其日志级别设置为debug,开发者可以查看更详细的日志信息来定位问题
   # 而对于service和controller层,使用info级别可以保持日志的清晰,同时记录足够的信息以供监控应用程序的运行情况
+logging:
   level:
     com:
       example:

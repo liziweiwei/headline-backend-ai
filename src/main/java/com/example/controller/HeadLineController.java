@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("headline")
 @Slf4j
-//@CrossOrigin
 public class HeadLineController {
 
     @Autowired
