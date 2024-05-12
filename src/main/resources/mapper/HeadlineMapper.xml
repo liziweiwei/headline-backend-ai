@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.HeadlineMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.pojo.entity.Headline">
+        <id property="hid" column="hid" jdbcType="INTEGER"/>
+        <result property="title" column="title" jdbcType="VARCHAR"/>
+        <result property="article" column="article" jdbcType="VARCHAR"/>
+        <result property="type" column="type" jdbcType="INTEGER"/>
+        <result property="publisher" column="publisher" jdbcType="INTEGER"/>
+        <result property="pageViews" column="page_views" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="version" column="version" jdbcType="INTEGER"/>
+        <result property="isDeleted" column="is_deleted" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        hid
+        ,title,article,
+        type,publisher,page_views,
+        create_time,update_time,version,
+        is_deleted
+    </sql>
+
+    <!--
+    分页查询首页头条信息
+    page_views pageViews 起别名适用于SQL查询返回的各个字段综合起来并不和任何一个现有的实体类对应
+    没法封装到实体类对象中,可以用map接;若有实体类,则会自动映射,不用起别名
+    -->
+    <select id="findMyPage" resultType="map">
+        select hid,title,type,page_views pageViews,TIMESTAMPDIFF(HOUR,create_time,NOW())
+        pastHours,publisher
+        from news_headline where is_deleted=0
+        <if test="portalPageQueryDTO.keyWords !=null and portalPageQueryDTO.keyWords.length()>0 ">
+            and title like concat('%',#{portalPageQueryDTO.keyWords},'%')
+        </if>
+        <if test="portalPageQueryDTO.type != 0">
+            and type = #{portalPageQueryDTO.type}
+        </if>
+        order by pastHours DESC,pageViews DESC
+    </select>
+
+    <!--
+    查询头条详情
+    version字段在多表中都是存在的，需要指定清楚
+    news_headline.version
+    Column 'version' in field list is ambiguous
+    -->
+    <select id="findMyHeadlineDetail" resultType="map">
+        select hid
+             , title
+             , article
+             , type
+             , news_headline.version
+             , tname                                  typeName
+             , page_views                             pageViews
+             , update_time                            updateTime
+             , TIMESTAMPDIFF(HOUR,create_time, NOW()) pastHours
+             , publisher
+             , nick_name                              author
+        from news_headline
+                 left join news_type t on news_headline.type = t.tid
+                 left join news_user u on news_headline.publisher = u.uid
+        where hid = #{hid}
+    </select>
+</mapper>
