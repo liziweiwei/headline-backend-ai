@@ -18,7 +18,8 @@ spring:
       driver-class-name: com.mysql.cj.jdbc.Driver
   ai:
     openai:
-      api-key: YOUR_API_KEY
+      api-key: sk-PQmVd4MA7pIpddyIC354E8F9D04549A2B9D2763e9c469b8d
+      base-url: https://api.xty.app
       chat:
         options:
           model: gpt-3.5-turbo
