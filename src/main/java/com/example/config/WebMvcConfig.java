@@ -60,4 +60,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
         // 将自定义的消息转换器添加到列表的最前面,以优先使用
         converters.add(0, converter);
     }
+
+    
 }

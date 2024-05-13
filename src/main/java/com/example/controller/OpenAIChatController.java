@@ -24,10 +24,10 @@ public class OpenAIChatController {
     }
 
     /**
-     * 生成对应的AI回复。
+     * 生成对应的AI回复
      *
      * @param message 用户输入的消息，默认为“介绍自己”。
-     * @return 返回一个包含生成内容的Map对象，其中key为"generation"，value为AI生成的回复内容。
+     * @return 返回一个包含生成内容的Map对象，其中key为"generation"，value为AI生成的回复内容
      */
     @GetMapping("/ai/generate")
     public Map generate(@RequestParam(value = "message", defaultValue = "介绍自己") String message) {

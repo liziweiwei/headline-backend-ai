@@ -21,6 +21,8 @@ spring:
       api-key: sk-PQmVd4MA7pIpddyIC354E8F9D04549A2B9D2763e9c469b8d
       base-url: https://api.xty.app
       chat:
+        api-key: sk-PQmVd4MA7pIpddyIC354E8F9D04549A2B9D2763e9c469b8d
+        base-url: https://api.xty.app
         options:
           model: gpt-3.5-turbo
           temperature: 0.7

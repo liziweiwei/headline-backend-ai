@@ -1,0 +1,77 @@
+package com.example.service.impl;
+
+import com.example.mapper.HeadlineMapper;
+import com.example.pojo.entity.Headline;
+import com.example.service.HeadLineAIService;
+import com.example.utils.Result;
+import jakarta.annotation.Resource;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.prompt.SystemPromptTemplate;
+import org.springframework.ai.openai.OpenAiChatClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class HeadLineAIServiceImpl implements HeadLineAIService {
+
+    @Resource(name = "myOpenAiChatClient")
+    private OpenAiChatClient chatClient;
+
+    @Autowired
+    private HeadlineMapper headlineMapper;
+
+    /**
+     * 对新闻进行总结概述
+     *
+     * @param hid 新闻的唯一标识符
+     * @return Result对象，包含总结后的新闻内容
+     */
+    @Override
+    public Result summarize(Integer hid) {
+        // 根据hid获取新闻文章
+        Headline headline = headlineMapper.selectById(hid);
+        String article = headline.getArticle();
+
+        // 创建用于AI总结的prompt
+        Prompt prompt = getSummarizePrompt(article);
+
+        // 调用聊天客户端进行新闻内容的总结
+        String reslut = chatClient.call(prompt).getResult().getOutput().getContent();
+
+        // 包装data数据
+        Map<String, Object> datamap = new HashMap<>();
+        datamap.put("headlinesummary", reslut);
+
+        return Result.success(datamap);
+    }
+
+
+    /**
+     * 根据提供的消息创建一个Prompt对象
+     *
+     * @param message 用户的消息内容
+     * @return 返回一个包含用户消息和系统消息的Prompt对象
+     */
+    private Prompt getSummarizePrompt(String message) {
+        // 初始化系统提示模板
+        String systemPrompt = "{prompt}";
+        SystemPromptTemplate systemPromptTemplate = new SystemPromptTemplate(systemPrompt);
+
+        // 创建用户消息对象
+        Message userMessage = new UserMessage(message);
+
+        // 使用模板和指定的提示内容创建系统消息
+        Message systemMessage = systemPromptTemplate.createMessage(Map.of("prompt", "将这篇新闻概括成一段话"));
+
+        // 创建并返回一个包含用户消息和系统消息的Prompt对象
+        Prompt prompt = new Prompt(List.of(userMessage, systemMessage));
+
+        return prompt;
+    }
+}

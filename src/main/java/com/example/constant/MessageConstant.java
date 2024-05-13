@@ -30,4 +30,5 @@ public class MessageConstant {
     public static final String DEFAULT_ADDRESS_NOT_FOUND = "没有查询到默认地址";
     public static final String ADMIN_CANNOT_REMOVE = "管理员不能删除";
     public static final String EMPLOYEE_NOT_FOUND = "用户不存在";
+    public static final String AI_Connection_FAILURE = "ChatGpt连接异常";
 }
