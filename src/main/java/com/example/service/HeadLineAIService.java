@@ -10,4 +10,12 @@ public interface HeadLineAIService {
      * @return
      */
     Result summarize(Integer hid);
+
+    /**
+     * 润色文章
+     *
+     * @param hid
+     * @return
+     */
+    Result polish(Integer hid);
 }

@@ -1,5 +1,7 @@
 package com.example.service.impl;
 
+import com.example.constant.MessageConstant;
+import com.example.exception.AIConnectionException;
 import com.example.mapper.HeadlineMapper;
 import com.example.pojo.entity.Headline;
 import com.example.service.HeadLineAIService;
@@ -30,23 +32,54 @@ public class HeadLineAIServiceImpl implements HeadLineAIService {
      * 对新闻进行总结概述
      *
      * @param hid 新闻的唯一标识符
-     * @return Result对象，包含总结后的新闻内容
+     * @return Result对象, 包含总结后的新闻内容
      */
     @Override
     public Result summarize(Integer hid) {
         // 根据hid获取新闻文章
         Headline headline = headlineMapper.selectById(hid);
+
         String article = headline.getArticle();
 
         // 创建用于AI总结的prompt
         Prompt prompt = getSummarizePrompt(article);
 
         // 调用聊天客户端进行新闻内容的总结
+        if (chatClient == null) {
+            throw new AIConnectionException(MessageConstant.AI_Connection_FAILURE);
+        }
         String reslut = chatClient.call(prompt).getResult().getOutput().getContent();
 
         // 包装data数据
         Map<String, Object> datamap = new HashMap<>();
         datamap.put("headlinesummary", reslut);
+
+        return Result.success(datamap);
+    }
+
+    /**
+     * 对新闻进行润色
+     *
+     * @param hid 新闻的唯一标识符
+     * @return Result对象, 包含润色后的新闻内容
+     */
+    @Override
+    public Result polish(Integer hid) {
+        // 根据hid获取新闻文章
+        Headline headline = headlineMapper.selectById(hid);
+        String article = headline.getArticle();
+        // 创建用于AI润色的prompt
+        Prompt prompt = getPolishPrompt(article);
+
+        // 调用聊天客户端进行新闻内容的润色
+        if (chatClient == null) {
+            throw new AIConnectionException(MessageConstant.AI_Connection_FAILURE);
+        }
+        String reslut = chatClient.call(prompt).getResult().getOutput().getContent();
+
+        // 包装data数据
+        Map<String, Object> datamap = new HashMap<>();
+        datamap.put("headlinepolish", reslut);
 
         return Result.success(datamap);
     }
@@ -67,7 +100,30 @@ public class HeadLineAIServiceImpl implements HeadLineAIService {
         Message userMessage = new UserMessage(message);
 
         // 使用模板和指定的提示内容创建系统消息
-        Message systemMessage = systemPromptTemplate.createMessage(Map.of("prompt", "将这篇新闻概括成一段话"));
+        Message systemMessage = systemPromptTemplate.createMessage(Map.of("prompt", "将这篇新闻总结成为几段话"));
+
+        // 创建并返回一个包含用户消息和系统消息的Prompt对象
+        Prompt prompt = new Prompt(List.of(userMessage, systemMessage));
+
+        return prompt;
+    }
+
+    /**
+     * 根据提供的消息创建一个Prompt对象
+     *
+     * @param message 用户的消息内容
+     * @return 返回一个包含用户消息和系统消息的Prompt对象
+     */
+    private Prompt getPolishPrompt(String message) {
+        // 初始化系统提示模板
+        String systemPrompt = "{prompt}";
+        SystemPromptTemplate systemPromptTemplate = new SystemPromptTemplate(systemPrompt);
+
+        // 创建用户消息对象
+        Message userMessage = new UserMessage(message);
+
+        // 使用模板和指定的提示内容创建系统消息
+        Message systemMessage = systemPromptTemplate.createMessage(Map.of("prompt", "将这篇新闻进行润色"));
 
         // 创建并返回一个包含用户消息和系统消息的Prompt对象
         Prompt prompt = new Prompt(List.of(userMessage, systemMessage));
