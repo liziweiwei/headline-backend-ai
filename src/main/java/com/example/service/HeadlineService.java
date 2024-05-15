@@ -2,6 +2,7 @@ package com.example.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.pojo.dto.HeadlineDTO;
+import com.example.pojo.dto.HeadlineHistoryDTO;
 import com.example.pojo.dto.HeadlineUpdateDTO;
 import com.example.pojo.dto.PortalPageQueryDTO;
 import com.example.pojo.entity.Headline;
@@ -22,7 +23,7 @@ public interface HeadlineService extends IService<Headline> {
     /**
      * 查询头条详情
      */
-    Result showHeadlineDetail(Integer hid);
+    Result showHeadlineDetail(Integer hid, Integer uid);
 
     /**
      * 头条发布实现
@@ -43,4 +44,9 @@ public interface HeadlineService extends IService<Headline> {
      * 删除头条
      */
     Result removeByHid(Integer hid);
+
+    /**
+     * 头条历史记录
+     */
+    Result findHistoryPage(HeadlineHistoryDTO headlineDTO);
 }

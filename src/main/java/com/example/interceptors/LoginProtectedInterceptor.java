@@ -1,8 +1,8 @@
 package com.example.interceptors;
 
-import com.example.constant.MessageConstant;
 import com.example.utils.JwtHelper;
 import com.example.utils.Result;
+import com.example.utils.ResultCodeEnum;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,6 +22,7 @@ public class LoginProtectedInterceptor implements HandlerInterceptor {
     @Autowired
     private JwtHelper jwtHelper;
 
+
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
         System.out.println("当前线程id:" + Thread.currentThread().getId());
@@ -39,21 +40,28 @@ public class LoginProtectedInterceptor implements HandlerInterceptor {
         if (!jwtHelper.isExpiration(token)) {
             return true;
         }
-        
+
+
+//        Result result = Result.error(MessageConstant.USER_NOT_LOGIN);
+//
+//        // 未登录,响应一个json给前端,这里不在controller层,无法直接返回,可以用jackson提供的 java对象和json字符串相互转换的对象映射类
+//        // 创建ObjectMapper实例，用于对象与JSON之间的转换
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        // 将Java对象转换为JSON字符串
+//        String json = objectMapper.writeValueAsString(result);
+//        // 将JSON字符串写入HTTP响应中
+//        response.getWriter().print(json);
+
+
+        // 添加后没有提示框
         // token无效,没有token或者token过期，重新设计返回给前端的参数,内容类型为JSON
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 设置状态码为401
+        // response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 设置状态码为401
 
-        // 无效,返回504的状态json
-        // Result result = Result.build(null, ResultCodeEnum.NOTLOGIN);
+        // 无效返回504的状态json
+        Result result = Result.build(null, ResultCodeEnum.NOTLOGIN);
 
-        Result result = Result.error(MessageConstant.USER_NOT_LOGIN);
-
-        // 未登录,响应一个json给前端,这里不在controller层,无法直接返回,可以用jackson提供的 java对象和json字符串相互转换的对象映射类
-        // 创建ObjectMapper实例，用于对象与JSON之间的转换
         ObjectMapper objectMapper = new ObjectMapper();
-        // 将Java对象转换为JSON字符串
         String json = objectMapper.writeValueAsString(result);
-        // 将JSON字符串写入HTTP响应中
         response.getWriter().print(json);
 
         return false;

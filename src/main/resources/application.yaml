@@ -18,10 +18,10 @@ spring:
       driver-class-name: com.mysql.cj.jdbc.Driver
   ai:
     openai:
-      api-key: sk-PQmVd4MA7pIpddyIC354E8F9D04549A2B9D2763e9c469b8d
+      api-key: sk-RDmvMXMyT5ttIUvN9e811a79F733484a83C5A204C0F7013a
       base-url: https://api.xty.app
       chat:
-        api-key: sk-PQmVd4MA7pIpddyIC354E8F9D04549A2B9D2763e9c469b8d
+        api-key: sk-RDmvMXMyT5ttIUvN9e811a79F733484a83C5A204C0F7013a
         base-url: https://api.xty.app
         options:
           model: gpt-3.5-turbo
@@ -29,7 +29,7 @@ spring:
 
 # mybatis-plus的配置
 mybatis-plus:
-  type-aliases-package: com.example.pojo,com.example.pojo.vo,com.example.pojo.dto
+  type-aliases-package: com.example.pojo.vo,com.example.pojo.dto,com.example.pojo.entity
   global-config:
     db-config:
       logic-delete-field: isDeleted  #全局逻辑删除 有默认值

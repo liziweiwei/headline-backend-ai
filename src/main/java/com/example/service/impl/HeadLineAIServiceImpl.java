@@ -7,6 +7,8 @@ import com.example.pojo.entity.Headline;
 import com.example.service.HeadLineAIService;
 import com.example.utils.Result;
 import jakarta.annotation.Resource;
+import org.springframework.ai.chat.ChatResponse;
+import org.springframework.ai.chat.Generation;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -45,10 +47,21 @@ public class HeadLineAIServiceImpl implements HeadLineAIService {
         Prompt prompt = getSummarizePrompt(article);
 
         // 调用聊天客户端进行新闻内容的总结
-        if (chatClient == null) {
-            throw new AIConnectionException(MessageConstant.AI_Connection_FAILURE);
+//        if (chatClient == null) {
+//            throw new AIConnectionException(MessageConstant.AI_Connection_FAILURE);
+//        }
+        String reslut = "";
+        if (chatClient != null) {
+            ChatResponse chatResponse = chatClient.call(prompt);
+            if (chatResponse != null) {
+                Generation generation = chatResponse.getResult();
+                if (generation != null) {
+                    reslut = generation.getOutput().getContent();
+                }
+            } else {
+                throw new AIConnectionException(MessageConstant.AI_Connection_FAILURE);
+            }
         }
-        String reslut = chatClient.call(prompt).getResult().getOutput().getContent();
 
         // 包装data数据
         Map<String, Object> datamap = new HashMap<>();
@@ -75,7 +88,18 @@ public class HeadLineAIServiceImpl implements HeadLineAIService {
         if (chatClient == null) {
             throw new AIConnectionException(MessageConstant.AI_Connection_FAILURE);
         }
-        String reslut = chatClient.call(prompt).getResult().getOutput().getContent();
+        String reslut = "";
+        if (chatClient != null) {
+            ChatResponse chatResponse = chatClient.call(prompt);
+            if (chatResponse != null) {
+                Generation generation = chatResponse.getResult();
+                if (generation != null) {
+                    reslut = generation.getOutput().getContent();
+                }
+            } else {
+                throw new AIConnectionException(MessageConstant.AI_Connection_FAILURE);
+            }
+        }
 
         // 包装data数据
         Map<String, Object> datamap = new HashMap<>();
@@ -100,8 +124,8 @@ public class HeadLineAIServiceImpl implements HeadLineAIService {
         Message userMessage = new UserMessage(message);
 
         // 使用模板和指定的提示内容创建系统消息
-        Message systemMessage = systemPromptTemplate.createMessage(Map.of("prompt", "将这篇新闻总结成为几段话"));
-
+        Message systemMessage = systemPromptTemplate.createMessage(Map.of("prompt", "将这篇新闻总结成为几段话，具有准确性、简洁性、通俗性、客观性的特点"));
+        // Message systemMessage = systemPromptTemplate.createMessage(Map.of("prompt", "将这篇新闻总结成为几段话"));
         // 创建并返回一个包含用户消息和系统消息的Prompt对象
         Prompt prompt = new Prompt(List.of(userMessage, systemMessage));
 
@@ -123,7 +147,7 @@ public class HeadLineAIServiceImpl implements HeadLineAIService {
         Message userMessage = new UserMessage(message);
 
         // 使用模板和指定的提示内容创建系统消息
-        Message systemMessage = systemPromptTemplate.createMessage(Map.of("prompt", "将这篇新闻进行润色"));
+        Message systemMessage = systemPromptTemplate.createMessage(Map.of("prompt", "将这篇新闻进行润色，让新闻的内容充实，同时满足真实、客观、公正、平衡的特点"));
 
         // 创建并返回一个包含用户消息和系统消息的Prompt对象
         Prompt prompt = new Prompt(List.of(userMessage, systemMessage));

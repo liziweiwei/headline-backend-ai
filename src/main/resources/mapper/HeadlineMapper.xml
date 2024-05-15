@@ -66,4 +66,28 @@
                  left join news_user u on news_headline.publisher = u.uid
         where hid = #{hid}
     </select>
+    <!-- 查询历史记录 -->
+    <select id="findHistoryPage" resultType="map">
+        select h.hid
+        , h.title
+        , h.article
+        , h.type
+        , h.version
+        , t.tname typeName
+        , h.page_views pageViews
+        , h.update_time updateTime
+        , TIMESTAMPDIFF(HOUR,h.create_time, NOW()) pastHours
+        , h.publisher
+        , u.nick_name author
+        , news_history.browsing_time browsingTime
+        from news_history
+        left join news_headline h on news_history.hid = h.hid
+        left join news_type t on h.type = t.tid
+        left join news_user u on h.publisher = u.uid
+        where h.is_deleted=0 and news_history.uid = #{headlineHistoryDTO.uid}
+        <if test="headlineHistoryDTO.keyWords !=null and headlineHistoryDTO.keyWords.length()>0 ">
+            and h.title like concat('%',#{headlineHistoryDTO.keyWords},'%')
+        </if>
+        order by news_history.browsing_time desc
+    </select>
 </mapper>

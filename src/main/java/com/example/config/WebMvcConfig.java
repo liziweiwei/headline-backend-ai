@@ -40,8 +40,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 // 下面的界面未登录也能查看
                 .excludePathPatterns("/user/login") // 用户登陆界面
                 .excludePathPatterns("/portal/findAllTypes") // 查询首页分类
-                .excludePathPatterns("/portal/findNewsPage") // 分页查询头条信息
-                .excludePathPatterns("/portal/showHeadlineDetail"); // 查询头条详情
+                .excludePathPatterns("/portal/findNewsPage")// 分页查询头条信息
+                .excludePathPatterns("/headline/history");
+        // .excludePathPatterns("/portal/showHeadlineDetail"); // 查询头条详情
     }
 
     /**
@@ -61,5 +62,4 @@ public class WebMvcConfig implements WebMvcConfigurer {
         converters.add(0, converter);
     }
 
-    
 }

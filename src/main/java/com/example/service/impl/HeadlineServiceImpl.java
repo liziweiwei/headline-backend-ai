@@ -2,13 +2,17 @@ package com.example.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.mapper.HeadlineMapper;
+import com.example.mapper.HistoryMapper;
 import com.example.pojo.dto.HeadlineDTO;
+import com.example.pojo.dto.HeadlineHistoryDTO;
 import com.example.pojo.dto.HeadlineUpdateDTO;
 import com.example.pojo.dto.PortalPageQueryDTO;
 import com.example.pojo.entity.Headline;
+import com.example.pojo.entity.History;
 import com.example.pojo.vo.PortalPageQueryVO;
 import com.example.service.HeadlineService;
 import com.example.utils.JwtHelper;
@@ -17,10 +21,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -30,6 +32,9 @@ public class HeadlineServiceImpl extends ServiceImpl<HeadlineMapper, Headline> i
 
     @Autowired
     private HeadlineMapper headlineMapper;
+
+    @Autowired
+    private HistoryMapper historyMapper;
 
     @Autowired
     private JwtHelper jwtHelper;
@@ -123,9 +128,17 @@ public class HeadlineServiceImpl extends ServiceImpl<HeadlineMapper, Headline> i
      * 2.修改阅读量 + 1 【只要修改表的内容，就要使用version乐观锁】
      */
     @Override
-    public Result showHeadlineDetail(Integer hid) {
+    public Result showHeadlineDetail(Integer hid, Integer uid) {
         // 多表,自定义查询方法;获取查询得到的一个map数据
         Map<String, Object> headlineDetailMapData = headlineMapper.findMyHeadlineDetail(hid);
+
+        // 添加浏览记录
+        History history = new History();
+
+        history.setHid(hid);
+        history.setUid(uid);
+        history.setBrowsingTime(new Date());
+        historyMapper.insert(history);
 
         // 包装data数据
         Map<String, Object> datamap = new HashMap<>();
@@ -221,6 +234,58 @@ public class HeadlineServiceImpl extends ServiceImpl<HeadlineMapper, Headline> i
     public Result removeByHid(Integer hid) {
         headlineMapper.deleteById(hid);
         return Result.success(null);
+    }
+
+    /**
+     * 头条历史记录
+     */
+    @Override
+    public Result findHistoryPage(HeadlineHistoryDTO headlineHistoryDTO) {
+        // Mybatis提供的分页查询操作 Page -> (当前页数, 页容量)
+        IPage<Map<String, Object>> iPage = new Page<>(headlineHistoryDTO.getPageNum(), headlineHistoryDTO.getPageSize());
+
+        headlineMapper.findHistoryPage(iPage, headlineHistoryDTO);
+
+        // 获取pageData当前页数据
+        List<Map<String, Object>> pageDataRecords = iPage.getRecords();
+
+
+        // 使用流API来过滤和收集数据
+        Map<Integer, Map<String, Object>> maxBrowsingTimeRecords = pageDataRecords.stream()
+                .collect(Collectors.toMap(
+                        map -> (Integer) map.get("hid"), // 使用 "hid" 作为键
+                        map -> map, // 使用整个Map作为值
+                        (existingValue, newValue) -> {
+                            // 比较browsingTime并保留最大的
+                            LocalDateTime existingTime = (LocalDateTime) existingValue.get("browsingTime");
+                            LocalDateTime newTime = (LocalDateTime) newValue.get("browsingTime");
+                            // 使用 isAfter 方法比较时间，返回时间更晚的记录
+                            return existingTime.isAfter(newTime) ? existingValue : newValue;
+                        },
+                        () -> new HashMap<>()) // 提供一个Supplier用于Map的初始化，确保线程安全
+                );
+
+        // 将过滤后的数据转换回 List,uniqueRecordsList包含了按照 "hid" 去重后的记录，每个 "hid" 对应的browsing_time是最大的
+        List<Map<String, Object>> uniqueRecordsList = new ArrayList<>(maxBrowsingTimeRecords.values());
+
+        // 使用流对列表进行排序，基于browsingTime降序排列,sortedRecordsList现在包含了按照 "hid" 去重且根据 "browsingTime" 降序排列的记录
+        List<Map<String, Object>> sortedRecordsList = uniqueRecordsList.stream()
+                .sorted(Comparator.comparing(record -> (LocalDateTime) record.get("browsingTime"), Comparator.reverseOrder()))
+                .collect(Collectors.toList());
+
+        // 包装pageInfo数据
+        Map<String, Object> pageInfomap = new HashMap<>();
+        pageInfomap.put("pageData", sortedRecordsList);
+        pageInfomap.put("pageNum", iPage.getCurrent()); // 当前页码数
+        pageInfomap.put("pageSize", iPage.getSize());   // 当前页大小
+        pageInfomap.put("totalPage", iPage.getPages()); // 总页数
+        pageInfomap.put("totalSize", iPage.getTotal()); // 总记录数
+
+        // 包装data数据
+        Map<String, Object> datamap = new HashMap<>();
+        datamap.put("pageInfo", pageInfomap);
+
+        return Result.success(datamap);
     }
 }
 

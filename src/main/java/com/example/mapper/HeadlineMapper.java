@@ -2,6 +2,7 @@ package com.example.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.example.pojo.dto.HeadlineHistoryDTO;
 import com.example.pojo.dto.PortalPageQueryDTO;
 import com.example.pojo.entity.Headline;
 import org.apache.ibatis.annotations.Mapper;
@@ -28,6 +29,14 @@ public interface HeadlineMapper extends BaseMapper<Headline> {
      * 添加@MapKey("hid")后，map的键无法读出
      */
     Map<String, Object> findMyHeadlineDetail(Integer hid);
+
+    /**
+     * 查询历史记录
+     *
+     * @param iPage
+     * @param headlineHistoryDTO
+     */
+    IPage<Map<String, Object>> findHistoryPage(IPage<Map<String, Object>> iPage, @Param("headlineHistoryDTO") HeadlineHistoryDTO headlineHistoryDTO);
 }
 
 

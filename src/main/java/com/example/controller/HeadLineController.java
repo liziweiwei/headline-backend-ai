@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import com.example.pojo.dto.HeadlineDTO;
+import com.example.pojo.dto.HeadlineHistoryDTO;
 import com.example.pojo.dto.HeadlineUpdateDTO;
 import com.example.service.HeadlineService;
 import com.example.utils.Result;
@@ -33,7 +34,7 @@ public class HeadLineController {
     }
 
     /**
-     * 根据hid查询新闻详情
+     * 根据hid查询新闻详情(数据回显)
      *
      * @param hid
      * @return
@@ -74,6 +75,21 @@ public class HeadLineController {
         log.info("删除新闻...");
 
         Result result = headlineService.removeByHid(hid);
+        return result;
+    }
+
+    /**
+     * 查询新闻浏览历史
+     *
+     * @param headlineHistoryDTO
+     * @return
+     */
+    @PostMapping("/history")
+    public Result findHistoryPage(@RequestBody HeadlineHistoryDTO headlineHistoryDTO) {
+
+        log.info("查询新闻浏览记录...");
+
+        Result result = headlineService.findHistoryPage(headlineHistoryDTO);
         return result;
     }
 }

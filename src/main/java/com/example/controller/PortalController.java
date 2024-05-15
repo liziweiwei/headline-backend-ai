@@ -47,11 +47,11 @@ public class PortalController {
      * 查询头条详情
      */
     @PostMapping("showHeadlineDetail")
-    public Result showHeadlineDetail(Integer hid) {
+    public Result showHeadlineDetail(Integer hid, Integer uid) {
 
         log.info("查询头条详情,前端传来的hid:{}", hid);
 
-        Result result = headlineService.showHeadlineDetail(hid);
+        Result result = headlineService.showHeadlineDetail(hid, uid);
         return result;
     }
 
