@@ -22,7 +22,6 @@ public class LoginProtectedInterceptor implements HandlerInterceptor {
     @Autowired
     private JwtHelper jwtHelper;
 
-
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
         System.out.println("当前线程id:" + Thread.currentThread().getId());
@@ -41,6 +40,9 @@ public class LoginProtectedInterceptor implements HandlerInterceptor {
             return true;
         }
 
+        // 添加后不再显示提示框
+        // token无效,没有token或者token过期，重新设计返回给前端的参数,内容类型为JSON
+        // response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 设置状态码为401
 
 //        Result result = Result.error(MessageConstant.USER_NOT_LOGIN);
 //
@@ -52,10 +54,6 @@ public class LoginProtectedInterceptor implements HandlerInterceptor {
 //        // 将JSON字符串写入HTTP响应中
 //        response.getWriter().print(json);
 
-
-        // 添加后没有提示框
-        // token无效,没有token或者token过期，重新设计返回给前端的参数,内容类型为JSON
-        // response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 设置状态码为401
 
         // 无效返回504的状态json
         Result result = Result.build(null, ResultCodeEnum.NOTLOGIN);
