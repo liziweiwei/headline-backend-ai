@@ -8,6 +8,7 @@ import com.example.pojo.entity.Headline;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,12 +32,19 @@ public interface HeadlineMapper extends BaseMapper<Headline> {
     Map<String, Object> findMyHeadlineDetail(Integer hid);
 
     /**
-     * 查询历史记录
+     * 查询历史记录(分页)
      *
      * @param iPage
      * @param headlineHistoryDTO
      */
     IPage<Map<String, Object>> findHistoryPage(IPage<Map<String, Object>> iPage, @Param("headlineHistoryDTO") HeadlineHistoryDTO headlineHistoryDTO);
+
+    /**
+     * 查询历史记录(所有,不分页)
+     *
+     * @param headlineHistoryDTO
+     */
+    List<Map<String, Object>> findHistory(@Param("headlineHistoryDTO") HeadlineHistoryDTO headlineHistoryDTO);
 }
 
 

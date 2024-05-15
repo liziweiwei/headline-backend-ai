@@ -2,7 +2,6 @@ package com.example.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.mapper.HeadlineMapper;
@@ -241,14 +240,9 @@ public class HeadlineServiceImpl extends ServiceImpl<HeadlineMapper, Headline> i
      */
     @Override
     public Result findHistoryPage(HeadlineHistoryDTO headlineHistoryDTO) {
-        // Mybatis提供的分页查询操作 Page -> (当前页数, 页容量)
-        IPage<Map<String, Object>> iPage = new Page<>(headlineHistoryDTO.getPageNum(), headlineHistoryDTO.getPageSize());
 
-        headlineMapper.findHistoryPage(iPage, headlineHistoryDTO);
-
-        // 获取pageData当前页数据
-        List<Map<String, Object>> pageDataRecords = iPage.getRecords();
-
+        // 查询所有记录
+        List<Map<String, Object>> pageDataRecords = headlineMapper.findHistory(headlineHistoryDTO);
 
         // 使用流API来过滤和收集数据
         Map<Integer, Map<String, Object>> maxBrowsingTimeRecords = pageDataRecords.stream()
@@ -276,10 +270,6 @@ public class HeadlineServiceImpl extends ServiceImpl<HeadlineMapper, Headline> i
         // 包装pageInfo数据
         Map<String, Object> pageInfomap = new HashMap<>();
         pageInfomap.put("pageData", sortedRecordsList);
-        pageInfomap.put("pageNum", iPage.getCurrent()); // 当前页码数
-        pageInfomap.put("pageSize", iPage.getSize());   // 当前页大小
-        pageInfomap.put("totalPage", iPage.getPages()); // 总页数
-        pageInfomap.put("totalSize", iPage.getTotal()); // 总记录数
 
         // 包装data数据
         Map<String, Object> datamap = new HashMap<>();
