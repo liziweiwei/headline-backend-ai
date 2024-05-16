@@ -14,6 +14,8 @@ public class History implements Serializable {
 
     private Integer hid;
 
+    private String title;
+
     private Integer uid;
 
     private Date browsingTime;

@@ -2,6 +2,7 @@ package com.example.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.mapper.HeadlineMapper;
@@ -131,13 +132,29 @@ public class HeadlineServiceImpl extends ServiceImpl<HeadlineMapper, Headline> i
         // 多表,自定义查询方法;获取查询得到的一个map数据
         Map<String, Object> headlineDetailMapData = headlineMapper.findMyHeadlineDetail(hid);
 
-        // 添加浏览记录
-        History history = new History();
-
-        history.setHid(hid);
-        history.setUid(uid);
-        history.setBrowsingTime(new Date());
-        historyMapper.insert(history);
+        // 组装查询条件
+        LambdaQueryWrapper<History> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(History::getHid, hid)
+                .eq(History::getUid, uid);
+        // 组装更新条件
+        LambdaUpdateWrapper<History> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(History::getHid, hid)
+                .eq(History::getUid, uid)
+                .set(History::getBrowsingTime, new Date());
+        if (historyMapper.selectCount(queryWrapper) == 0) {
+            // 查询新闻标题
+            String title = (String) headlineDetailMapData.get("title");
+            // 添加浏览记录
+            History history = new History();
+            history.setHid(hid);
+            history.setUid(uid);
+            history.setTitle(title);
+            history.setBrowsingTime(new Date());
+            historyMapper.insert(history);
+        } else {
+            // 更新浏览时间
+            historyMapper.update(null, updateWrapper);
+        }
 
         // 包装data数据
         Map<String, Object> datamap = new HashMap<>();
@@ -269,7 +286,9 @@ public class HeadlineServiceImpl extends ServiceImpl<HeadlineMapper, Headline> i
 
         // 包装pageInfo数据
         Map<String, Object> pageInfomap = new HashMap<>();
-        pageInfomap.put("pageData", sortedRecordsList);
+        // 新增记录方式，不再存在相同的浏览记录
+        // pageInfomap.put("pageData", sortedRecordsList);
+        pageInfomap.put("pageData", pageDataRecords);
 
         // 包装data数据
         Map<String, Object> datamap = new HashMap<>();

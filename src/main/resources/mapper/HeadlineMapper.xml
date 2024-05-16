@@ -66,7 +66,7 @@
                  left join news_user u on news_headline.publisher = u.uid
         where hid = #{hid}
     </select>
-    <!-- 查询历史记录 -->
+    <!-- 查询历史记录(分页) -->
     <select id="findHistoryPage" resultType="map">
         select h.hid
         , h.title
