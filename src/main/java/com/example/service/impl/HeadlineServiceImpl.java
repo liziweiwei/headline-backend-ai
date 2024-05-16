@@ -296,6 +296,15 @@ public class HeadlineServiceImpl extends ServiceImpl<HeadlineMapper, Headline> i
 
         return Result.success(datamap);
     }
+
+    /**
+     * 头条历史记录删除,逻辑删除
+     */
+    @Override
+    public Result removeHistory(Integer id) {
+        historyMapper.deleteById(id);
+        return Result.success(null);
+    }
 }
 
 

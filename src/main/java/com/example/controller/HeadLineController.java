@@ -92,4 +92,19 @@ public class HeadLineController {
         Result result = headlineService.findHistoryPage(headlineHistoryDTO);
         return result;
     }
+
+    /**
+     * 删除新闻浏览记录
+     *
+     * @param id
+     * @return
+     */
+    @PostMapping("/removehistory")
+    public Result removeHistory(Integer id) {
+
+        log.info("删除新闻浏览记录...");
+
+        Result result = headlineService.removeHistory(id);
+        return result;
+    }
 }

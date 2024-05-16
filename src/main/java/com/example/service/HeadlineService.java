@@ -46,7 +46,12 @@ public interface HeadlineService extends IService<Headline> {
     Result removeByHid(Integer hid);
 
     /**
-     * 头条历史记录
+     * 查询头条历史记录
      */
     Result findHistoryPage(HeadlineHistoryDTO headlineDTO);
+
+    /**
+     * 删除头条历史记录
+     */
+    Result removeHistory(Integer id);
 }

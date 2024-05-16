@@ -93,7 +93,8 @@
 
     <!-- 查询历史记录 -->
     <select id="findHistory" resultType="map">
-        select h.hid
+        select news_history.id
+        , h.hid
         , h.title
         , h.article
         , h.type
@@ -101,7 +102,7 @@
         , t.tname typeName
         , h.page_views pageViews
         , h.update_time updateTime
-        , TIMESTAMPDIFF(HOUR,h.create_time, NOW()) pastHours
+        , TIMESTAMPDIFF(HOUR,h.update_time, NOW()) pastHours
         , h.publisher
         , u.nick_name author
         , news_history.browsing_time browsingTime
@@ -109,7 +110,7 @@
         left join news_headline h on news_history.hid = h.hid
         left join news_type t on h.type = t.tid
         left join news_user u on h.publisher = u.uid
-        where h.is_deleted=0 and news_history.uid = #{headlineHistoryDTO.uid}
+        where news_history.is_deleted = 0 and news_history.uid = #{headlineHistoryDTO.uid}
         <if test="headlineHistoryDTO.keyWords !=null and headlineHistoryDTO.keyWords.length()>0 ">
             and h.title like concat('%',#{headlineHistoryDTO.keyWords},'%')
         </if>
