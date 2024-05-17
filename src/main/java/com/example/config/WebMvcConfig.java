@@ -37,11 +37,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addPathPatterns("/headline/**")
                 .addPathPatterns("/user/**")
                 .addPathPatterns("/portal/**")
-                // 下面的界面未登录也能查看
+                // 下面的接口未登录也能访问
                 .excludePathPatterns("/user/login") // 用户登陆界面
                 .excludePathPatterns("/portal/findAllTypes") // 查询首页分类
-                .excludePathPatterns("/portal/findNewsPage")// 分页查询头条信息
-                .excludePathPatterns("/headline/history");
+                .excludePathPatterns("/portal/findNewsPage");// 分页查询头条信息
+        //.excludePathPatterns("/headline/history");
         // TODO:此处逻辑后续要修改
         // .excludePathPatterns("/portal/showHeadlineDetail"); // 查询头条详情
     }
