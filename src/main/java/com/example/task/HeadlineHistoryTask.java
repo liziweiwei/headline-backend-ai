@@ -114,6 +114,9 @@ public class HeadlineHistoryTask {
             promptTemplate.add("item3", "娱乐");
             promptTemplate.add("item4", "科技");
             promptTemplate.add("item5", "其他");
+            // 防止OpenAI API在生成结果时提前终止生成过程，从而确保ChatCompletion对象的finishReason属性不为null
+            promptTemplate.add("stop", "false");
+            promptTemplate.add("stream", "false");
 
             // 记录调用OpenAI API获取的结果
             String result = "";
