@@ -1,8 +1,8 @@
 package com.example.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.mapper.HeadlineMapper;
@@ -13,7 +13,6 @@ import com.example.pojo.dto.HeadlineUpdateDTO;
 import com.example.pojo.dto.PortalPageQueryDTO;
 import com.example.pojo.entity.Headline;
 import com.example.pojo.entity.History;
-import com.example.pojo.vo.PortalPageQueryVO;
 import com.example.service.HeadlineService;
 import com.example.utils.JwtHelper;
 import com.example.utils.Result;
@@ -23,8 +22,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,69 +48,69 @@ public class HeadlineServiceImpl extends ServiceImpl<HeadlineMapper, Headline> i
 
         // Mybatis提供的分页查询操作 Page -> (当前页数, 页容量)
         // 没有对应的实体类来接收参数,所以IPage的接收数据类型是一个Map<String, Object>
-        // IPage<Map<String, Object>> iPage = new Page<>(portalPageQueryDTO.getPageNum(), portalPageQueryDTO.getPageSize());
-        //headlineMapper.findMyPage(iPage, portalPageQueryDTO);
+        IPage<Map<String, Object>> iPage = new Page<>(portalPageQueryDTO.getPageNum(), portalPageQueryDTO.getPageSize());
+        headlineMapper.findMyPage(iPage, portalPageQueryDTO);
 
         // 获取pageData当前页数据
-        // List<Map<String, Object>> pageDataRecords = iPage.getRecords();
-
-        // 包装pageInfo数据
-        // Map<String, Object> pageInfomap = new HashMap<>();
-        // pageInfomap.put("pageData", pageDataRecords);
-        // pageInfomap.put("pageNum", iPage.getCurrent()); // 当前页码数
-        // pageInfomap.put("pageSize", iPage.getSize());   // 当前页大小
-        // pageInfomap.put("totalPage", iPage.getPages()); // 总页数
-        // pageInfomap.put("totalSize", iPage.getTotal()); // 总记录数
-
-        // QueryWrapper + Mybatis-plus自己的分页方法Page + selectPage实现分页查询
-        QueryWrapper<Headline> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("is_deleted", 0);
-
-        if (portalPageQueryDTO.getKeyWords() != null && !portalPageQueryDTO.getKeyWords().equals("")) {
-            queryWrapper.like("title", portalPageQueryDTO.getKeyWords());
-        }
-        if (portalPageQueryDTO.getType() != 0) {
-            queryWrapper.eq("type", portalPageQueryDTO.getType());
-        }
-        queryWrapper.select("hid", "title", "type", "page_views", "update_time", "publisher");
-        queryWrapper.orderByDesc("update_time");
-
-        // 1.selectMaps方法(推荐),无法分页，只能自己对map集合处理
-        List<Map<String, Object>> maps = headlineMapper.selectMaps(queryWrapper);
-        // 数据格式:{hid=1, page_views=8, create_time=2023-05-25T09:26:20, publisher=1, title=特色产业激发乡村振兴新活力, type=1}
-
-        // 2.selectPage()方法可能会导致空指针异常,Mybatis-plus自己的分页方法Page
-        Page<Headline> page = new Page<>(portalPageQueryDTO.getPageNum(), portalPageQueryDTO.getPageSize());
-        // 单表分页查询,查询指定的列
-        headlineMapper.selectPage(page, queryWrapper);
-        // page中的数据格式:为查询的列在Headline对象中可能会被设置为null,可能会导致空指针异常
-        // (hid=1, title=特色产业激发乡村振兴新活力, article=null, type=1, publisher=1, pageViews=8, createTime=Thu May 25 09:26:20 CST 2023, updateTime=null, version=null, isDeleted=null)
-
-        // 转换函数，用于将Headline对象转换为PortalPageQueryVO对象
-        Function<Headline, PortalPageQueryVO> entityToVOConverter = headline -> {
-            // 创建VO对象并复制属性
-            PortalPageQueryVO portalPageQueryVO = new PortalPageQueryVO();
-            // 复制属性
-            portalPageQueryVO.setHid(headline.getHid());
-            portalPageQueryVO.setTitle(headline.getTitle());
-            portalPageQueryVO.setType(headline.getType());
-            portalPageQueryVO.setPageViews(headline.getPageViews());
-            portalPageQueryVO.setPastHours((int) TimeUnit.HOURS.convert(new Date().getTime() - headline.getUpdateTime().getTime(), TimeUnit.MILLISECONDS));
-            portalPageQueryVO.setPublisher(headline.getPublisher());
-            return portalPageQueryVO;
-        };
-        // 将Page<Headline>中的记录集合转换为List<PortalPageQueryVO>
-        List<PortalPageQueryVO> portalPageQueryVOList = page.getRecords().stream()
-                .map(entityToVOConverter) // 使用转换函数
-                .collect(Collectors.toList());
+        List<Map<String, Object>> pageDataRecords = iPage.getRecords();
 
         // 包装pageInfo数据
         Map<String, Object> pageInfomap = new HashMap<>();
-        pageInfomap.put("pageData", portalPageQueryVOList);
-        pageInfomap.put("pageNum", page.getCurrent()); // 当前页码数
-        pageInfomap.put("pageSize", page.getSize());   // 当前页大小
-        pageInfomap.put("totalPage", page.getPages()); // 总页数
-        pageInfomap.put("totalSize", page.getTotal()); // 总记录数
+        pageInfomap.put("pageData", pageDataRecords);
+        pageInfomap.put("pageNum", iPage.getCurrent()); // 当前页码数
+        pageInfomap.put("pageSize", iPage.getSize());   // 当前页大小
+        pageInfomap.put("totalPage", iPage.getPages()); // 总页数
+        pageInfomap.put("totalSize", iPage.getTotal()); // 总记录数
+
+        // QueryWrapper + Mybatis-plus自己的分页方法Page + selectPage实现分页查询
+//        QueryWrapper<Headline> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.eq("is_deleted", 0);
+//
+//        if (portalPageQueryDTO.getKeyWords() != null && !portalPageQueryDTO.getKeyWords().equals("")) {
+//            queryWrapper.like("title", portalPageQueryDTO.getKeyWords());
+//        }
+//        if (portalPageQueryDTO.getType() != 0) {
+//            queryWrapper.eq("type", portalPageQueryDTO.getType());
+//        }
+//        queryWrapper.select("hid", "title", "type", "page_views", "update_time", "publisher");
+//        queryWrapper.orderByDesc("update_time");
+//
+//        // 1.selectMaps方法(推荐),无法分页，只能自己对map集合处理
+//        List<Map<String, Object>> maps = headlineMapper.selectMaps(queryWrapper);
+//        // 数据格式:{hid=1, page_views=8, create_time=2023-05-25T09:26:20, publisher=1, title=特色产业激发乡村振兴新活力, type=1}
+//
+//        // 2.selectPage()方法可能会导致空指针异常,Mybatis-plus自己的分页方法Page
+//        Page<Headline> page = new Page<>(portalPageQueryDTO.getPageNum(), portalPageQueryDTO.getPageSize());
+//        // 单表分页查询,查询指定的列
+//        headlineMapper.selectPage(page, queryWrapper);
+//        // page中的数据格式:为查询的列在Headline对象中可能会被设置为null,可能会导致空指针异常
+//        // (hid=1, title=特色产业激发乡村振兴新活力, article=null, type=1, publisher=1, pageViews=8, createTime=Thu May 25 09:26:20 CST 2023, updateTime=null, version=null, isDeleted=null)
+//
+//        // 转换函数，用于将Headline对象转换为PortalPageQueryVO对象
+//        Function<Headline, PortalPageQueryVO> entityToVOConverter = headline -> {
+//            // 创建VO对象并复制属性
+//            PortalPageQueryVO portalPageQueryVO = new PortalPageQueryVO();
+//            // 复制属性
+//            portalPageQueryVO.setHid(headline.getHid());
+//            portalPageQueryVO.setTitle(headline.getTitle());
+//            portalPageQueryVO.setType(headline.getType());
+//            portalPageQueryVO.setPageViews(headline.getPageViews());
+//            portalPageQueryVO.setPastHours((int) TimeUnit.HOURS.convert(new Date().getTime() - headline.getUpdateTime().getTime(), TimeUnit.MILLISECONDS));
+//            portalPageQueryVO.setPublisher(headline.getPublisher());
+//            return portalPageQueryVO;
+//        };
+//        // 将Page<Headline>中的记录集合转换为List<PortalPageQueryVO>
+//        List<PortalPageQueryVO> portalPageQueryVOList = page.getRecords().stream()
+//                .map(entityToVOConverter) // 使用转换函数
+//                .collect(Collectors.toList());
+
+        // 包装pageInfo数据
+//        Map<String, Object> pageInfomap = new HashMap<>();
+//        pageInfomap.put("pageData", portalPageQueryVOList);
+//        pageInfomap.put("pageNum", page.getCurrent()); // 当前页码数
+//        pageInfomap.put("pageSize", page.getSize());   // 当前页大小
+//        pageInfomap.put("totalPage", page.getPages()); // 总页数
+//        pageInfomap.put("totalSize", page.getTotal()); // 总记录数
 
         // 包装data数据
         Map<String, Object> datamap = new HashMap<>();

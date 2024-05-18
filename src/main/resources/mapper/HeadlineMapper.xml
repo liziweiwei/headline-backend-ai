@@ -31,16 +31,18 @@
     没法封装到实体类对象中,可以用map接;若有实体类,则会自动映射,不用起别名
     -->
     <select id="findMyPage" resultType="map">
-        select hid,title,type,page_views pageViews,TIMESTAMPDIFF(HOUR,create_time,NOW())
-        pastHours,publisher
-        from news_headline where is_deleted=0
+        select hid,title,news_headline.type,page_views pageViews,TIMESTAMPDIFF(HOUR,create_time,NOW())
+        pastHours,publisher,news_recommendation.recommend_coefficient
+        from news_headline
+        left join news_recommendation on news_headline.type = news_recommendation.type
+        where is_deleted=0
         <if test="portalPageQueryDTO.keyWords !=null and portalPageQueryDTO.keyWords.length()>0 ">
-            and title like concat('%',#{portalPageQueryDTO.keyWords},'%')
+            and news_headline.title like concat('%',#{portalPageQueryDTO.keyWords},'%')
         </if>
         <if test="portalPageQueryDTO.type != 0">
-            and type = #{portalPageQueryDTO.type}
+            and news_headline.type = #{portalPageQueryDTO.type}
         </if>
-        order by pastHours DESC,pageViews DESC
+        order by news_recommendation.recommend_coefficient desc,pageViews desc
     </select>
 
     <!--

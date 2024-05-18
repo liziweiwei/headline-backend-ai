@@ -18,4 +18,9 @@ public interface HeadLineAIService {
      * @return
      */
     Result polish(Integer hid);
+
+    /**
+     * 分析浏览历史
+     */
+    Result analyzeHistory();
 }
