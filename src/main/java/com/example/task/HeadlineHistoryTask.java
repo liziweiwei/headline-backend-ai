@@ -2,11 +2,11 @@ package com.example.task;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.example.context.BaseContext;
 import com.example.mapper.HistoryMapper;
 import com.example.mapper.RecommendationMapper;
 import com.example.pojo.entity.History;
 import com.example.pojo.entity.Recommendation;
+import com.example.properties.UserIdProperties;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.ChatResponse;
@@ -36,17 +36,24 @@ public class HeadlineHistoryTask {
     @Autowired
     private RecommendationMapper recommendationMapper;
 
+    @Autowired
+    private UserIdProperties userIdProperties;
+
 
     /**
      * 分析用户的浏览历史(为类别添加推荐指数),自动更新推荐系数
      */
-    @Scheduled(cron = "0 0/2 * * * ?") // 每10分钟执行一次
+    @Scheduled(cron = "0 0/1 * * * ?") // 每10分钟执行一次
     public void updateRecommendCoefficient() {
 
         log.info("开始分析用户的浏览历史,自动更新推荐系数...");
 
         // 获取当前登录用户的id(不同线程ThreadLocal不共享)
-        Integer userId = BaseContext.getCurrentId().intValue();
+        // Integer userId = BaseContext.getCurrentId().intValue();
+
+        // 获取当前登录用户的id
+        Integer userId = userIdProperties.getUserId().intValue();
+        log.info("分析用户的浏览历史时的用户id" + userId);
 
         // 创建一个Map<Integer, Double>用于存储每个类别的推荐系数
         Map<Integer, Double> categoryMap = new HashMap<>();
@@ -186,6 +193,11 @@ public class HeadlineHistoryTask {
                 recommendationMapper.update(updateWrapperRecommend);
             }
         } else {
+            // 先清空表的内容(与userId不相同的列)，再插入数据
+            LambdaQueryWrapper<Recommendation> deleteWrapper = new LambdaQueryWrapper<>();
+            deleteWrapper.ne(Recommendation::getUid, userId);
+            recommendationMapper.delete(deleteWrapper);
+
             // 遍历Map,插入数据(news_recommendation)
             for (Map.Entry<Integer, Double> entry : categoryMap.entrySet()) {
                 Integer categoryId = entry.getKey();

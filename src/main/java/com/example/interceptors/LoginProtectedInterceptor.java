@@ -1,6 +1,6 @@
 package com.example.interceptors;
 
-import com.example.context.BaseContext;
+import com.example.properties.UserIdProperties;
 import com.example.utils.JwtHelper;
 import com.example.utils.Result;
 import com.example.utils.ResultCodeEnum;
@@ -25,6 +25,9 @@ public class LoginProtectedInterceptor implements HandlerInterceptor {
     @Autowired
     private JwtHelper jwtHelper;
 
+    @Autowired
+    private UserIdProperties userIdProperties;
+
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
         System.out.println("当前线程id:" + Thread.currentThread().getId());
@@ -40,8 +43,11 @@ public class LoginProtectedInterceptor implements HandlerInterceptor {
 
         // 在token中获取用户id
         Long userId = jwtHelper.getUserId(token);
-        // 将用户id存储到ThreadLocal(一个线程中的存储空间)
-        BaseContext.setCurrentId(userId);
+        // 将用户id存储到ThreadLocal(一个线程中的存储空间)(行不通)
+        // BaseContext.setCurrentId(userId);
+
+        // 将用户id存储到UserIdProperties的属性中
+        userIdProperties.setUserId(userId);
 
         log.info("当前用户id:{}", userId);
 
