@@ -2,6 +2,7 @@ package com.example.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.constant.MessageConstant;
+import com.example.context.BaseContext;
 import com.example.exception.AIConnectionException;
 import com.example.mapper.HeadlineMapper;
 import com.example.mapper.HistoryMapper;
@@ -198,10 +199,10 @@ public class HeadLineAIServiceImpl implements HeadLineAIService {
         Map<Integer, Double> categoryMap = new HashMap<>();
         // 按行分割字符串
         String[] lines = result.split("\n");
+
         // 枚举类别的枚举类型
         enum Category {
             新闻(1), 体育(2), 娱乐(3), 科技(4), 其他(5);
-
             private final int type;
 
             Category(int type) {
@@ -230,6 +231,9 @@ public class HeadLineAIServiceImpl implements HeadLineAIService {
         }
 
         // 遍历Map;存入或者更新数据库(news_recommendation)新闻类别推荐指数表
+        // 获取当前登录用户的id
+        Long userId = BaseContext.getCurrentId();
+
 
         return null;
     }

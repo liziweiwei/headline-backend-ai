@@ -1,6 +1,7 @@
 package com.example;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.example.context.BaseContext;
 import com.example.mapper.HistoryMapper;
 import com.example.pojo.entity.History;
 import jakarta.annotation.Resource;
@@ -141,5 +142,9 @@ class HeadlineBackendAiApplicationTests {
             }
         }
         System.out.println(categoryMap);
+
+        // 遍历Map;存入或者更新数据库(news_recommendation)新闻类别推荐指数表
+        // 获取当前登录用户的id
+        Long userId = BaseContext.getCurrentId();
     }
 }
