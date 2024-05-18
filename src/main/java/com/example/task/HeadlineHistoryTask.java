@@ -43,17 +43,12 @@ public class HeadlineHistoryTask {
     /**
      * 分析用户的浏览历史(为类别添加推荐指数),自动更新推荐系数
      */
-    @Scheduled(cron = "0 0/1 * * * ?") // 每10分钟执行一次
+    @Scheduled(cron = "0 0/10 * * * ?") // 每10分钟执行一次
     public void updateRecommendCoefficient() {
-
-        log.info("开始分析用户的浏览历史,自动更新推荐系数...");
-
-        // 获取当前登录用户的id(不同线程ThreadLocal不共享)
-        // Integer userId = BaseContext.getCurrentId().intValue();
 
         // 获取当前登录用户的id
         Integer userId = userIdProperties.getUserId().intValue();
-        log.info("分析用户的浏览历史时的用户id" + userId);
+        log.info("开始分析 用户id:{} 的浏览历史,自动更新该用户各类新闻的推荐系数...", userId);
 
         // 创建一个Map<Integer, Double>用于存储每个类别的推荐系数
         Map<Integer, Double> categoryMap = new HashMap<>();
@@ -120,6 +115,7 @@ public class HeadlineHistoryTask {
             promptTemplate.add("item4", "科技");
             promptTemplate.add("item5", "其他");
 
+            // 记录调用OpenAI API获取的结果
             String result = "";
             if (chatClient != null) {
                 ChatResponse chatResponse = chatClient.call(promptTemplate.create());
@@ -193,7 +189,8 @@ public class HeadlineHistoryTask {
                 recommendationMapper.update(updateWrapperRecommend);
             }
         } else {
-            // 先清空表的内容(与userId不相同的列)，再插入数据
+            log.info("用户id发生变化,变成 用户id:{},需要清空表(news_recommendation)的内容...", userId);
+            // 先清空表的内容(与userId不相同的列)(与MyBatis-Plus阻止全表更新删除插件相冲突)，再插入数据
             LambdaQueryWrapper<Recommendation> deleteWrapper = new LambdaQueryWrapper<>();
             deleteWrapper.ne(Recommendation::getUid, userId);
             recommendationMapper.delete(deleteWrapper);
