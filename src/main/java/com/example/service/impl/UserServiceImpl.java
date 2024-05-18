@@ -69,19 +69,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     /**
-     * 1.校验token的有效期
+     * 1.校验token的有效期,已经添加jwt拦截器，所以不需要校验token
      * 2.根据token解析出用户id
      * 3.根据用户id查询用户信息，返回请求体所需数据
      * 4.返回请求体所需数据(即去掉密码),封装result结果返回即可
      */
     @Override
     public Result getUserInfo(String token) {
-        // 已经添加jwt拦截器，所以不需要校验token
-        // if (jwtHelper.isExpiration(token)) {
-        //     // token失效，当成未登录看待
-        //     return Result.build(null, ResultCodeEnum.NOTLOGIN);
-        // }
-
         int loginUserId = jwtHelper.getUserId(token).intValue();
 
         LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();

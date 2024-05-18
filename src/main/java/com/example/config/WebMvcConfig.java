@@ -38,8 +38,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addPathPatterns("/user/**")
                 .addPathPatterns("/portal/**")
                 // 下面的接口未登录也能访问
-                .excludePathPatterns("/user/login") // 用户登陆界面
-                .excludePathPatterns("/portal/findAllTypes") // 查询首页分类
+                .excludePathPatterns("/user/login") // 用户登陆
+                .excludePathPatterns("/portal/findAllTypes") // 查询首页
                 .excludePathPatterns("/portal/findNewsPage");// 分页查询头条信息
         //.excludePathPatterns("/headline/history");
         // TODO:此处逻辑后续要修改

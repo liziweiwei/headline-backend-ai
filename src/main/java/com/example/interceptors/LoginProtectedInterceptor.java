@@ -7,6 +7,7 @@ import com.example.utils.ResultCodeEnum;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
@@ -18,6 +19,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
  * 无效--返回504
  */
 @Component
+@Slf4j
 public class LoginProtectedInterceptor implements HandlerInterceptor {
 
     @Autowired
@@ -38,8 +40,10 @@ public class LoginProtectedInterceptor implements HandlerInterceptor {
 
         // 在token中获取用户id
         Long userId = jwtHelper.getUserId(token);
-        // 将用户id存储到ThreadLocal(一个线程中的存储空间1)
+        // 将用户id存储到ThreadLocal(一个线程中的存储空间)
         BaseContext.setCurrentId(userId);
+
+        log.info("当前用户id:{}", userId);
 
         // 检查token是否有效
         if (!jwtHelper.isExpiration(token)) {
