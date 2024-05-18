@@ -43,7 +43,7 @@ public class LoginProtectedInterceptor implements HandlerInterceptor {
 
         // 在token中获取用户id
         Long userId = jwtHelper.getUserId(token);
-        // 将用户id存储到ThreadLocal(一个线程中的存储空间)(行不通)
+        // 将用户id存储到ThreadLocal(一个线程中的存储空间)(由于ThreadLocal在不同线程中,所以行不通)
         // BaseContext.setCurrentId(userId);
 
         // 将用户id存储到UserIdProperties的属性中
