@@ -4,8 +4,8 @@ server:
   servlet:
     context-path: /
 
-# druid 连接池
 spring:
+  # druid 连接池
   application:
     name: headline-backend-ai
   datasource:
@@ -18,13 +18,15 @@ spring:
       driver-class-name: com.mysql.cj.jdbc.Driver
   ai:
     openai:
-      api-key: sk-RDmvMXMyT5ttIUvN9e811a79F733484a83C5A204C0F7013a
-      base-url: https://api.xty.app
+      # 全局配置
+      api-key: sk-RDmvMXMyT5ttIUvN9e811a79F733484a83C5A204C0F7013a  # 申请的api-key
+      base-url: https://api.xty.app # openAi访问地址(国内代理)
+      # 聊天API配置
       chat:
         api-key: sk-RDmvMXMyT5ttIUvN9e811a79F733484a83C5A204C0F7013a
         base-url: https://api.xty.app
         options:
-          model: gpt-3.5-turbo
+          model: gpt-3.5-turbo # 模型配置
           temperature: 0.7
 
 # mybatis-plus的配置

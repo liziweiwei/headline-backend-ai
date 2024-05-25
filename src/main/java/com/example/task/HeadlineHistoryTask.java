@@ -95,10 +95,9 @@ public class HeadlineHistoryTask {
                     .filter(time -> !time.toString().isEmpty())
                     .collect(Collectors.toList());
 
-            /**
-             * 创建用于分析的prompt
-             * TODO:promptText的设计需要进一步优化,解决后,result的格式也会随之解决
-             */
+
+            // 创建用于分析的prompt
+            // TODO:promptText的设计需要进一步优化,解决后,result的格式也会随之解决
             final String promptText = """
                     读取{titleList}中的所有的新闻标题
                     读取{timeList}新闻的浏览时间，与上述新闻标题一一对应
