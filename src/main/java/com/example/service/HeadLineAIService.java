@@ -1,22 +1,23 @@
 package com.example.service;
 
+import com.example.pojo.dto.HeadlineAiDTO;
 import com.example.utils.Result;
 
 public interface HeadLineAIService {
     /**
      * 获取新闻摘要
      *
-     * @param hid
+     * @param headlineAiDTO
      * @return
      */
-    Result summarize(Integer hid);
+    Result summarize(HeadlineAiDTO headlineAiDTO);
 
     /**
      * 润色文章
      *
-     * @param hid
+     * @param headlineAiDTO
      * @return
      */
-    Result polish(Integer hid);
-    
+    Result polish(HeadlineAiDTO headlineAiDTO);
+
 }

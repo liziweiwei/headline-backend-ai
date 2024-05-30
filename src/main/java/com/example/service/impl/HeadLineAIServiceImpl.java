@@ -3,6 +3,7 @@ package com.example.service.impl;
 import com.example.constant.MessageConstant;
 import com.example.exception.AIConnectionException;
 import com.example.mapper.HeadlineMapper;
+import com.example.pojo.dto.HeadlineAiDTO;
 import com.example.pojo.entity.Headline;
 import com.example.service.HeadLineAIService;
 import com.example.utils.Result;
@@ -35,12 +36,13 @@ public class HeadLineAIServiceImpl implements HeadLineAIService {
     /**
      * 对新闻进行总结概述
      *
-     * @param hid 新闻的唯一标识符
+     * @param headlineAiDTO
      * @return Result对象, 包含总结后的新闻内容
      */
     @Override
-    public Result summarize(Integer hid) {
+    public Result summarize(HeadlineAiDTO headlineAiDTO) {
         // 根据hid获取新闻文章
+        Integer hid = headlineAiDTO.getHid();
         Headline headline = headlineMapper.selectById(hid);
         String article = headline.getArticle();
 
@@ -73,12 +75,14 @@ public class HeadLineAIServiceImpl implements HeadLineAIService {
     /**
      * 对新闻进行润色
      *
-     * @param hid 新闻的唯一标识符
+     * @param headlineAiDTO
      * @return Result对象, 包含润色后的新闻内容
      */
     @Override
-    public Result polish(Integer hid) {
+    public Result polish(HeadlineAiDTO headlineAiDTO) {
+
         // 根据hid获取新闻文章
+        Integer hid = headlineAiDTO.getHid();
         Headline headline = headlineMapper.selectById(hid);
         String article = headline.getArticle();
 

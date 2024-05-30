@@ -1,10 +1,12 @@
 package com.example.controller;
 
+import com.example.pojo.dto.HeadlineAiDTO;
 import com.example.service.HeadLineAIService;
 import com.example.utils.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,30 +21,30 @@ public class HeadLineAIController {
     /**
      * 文章总结
      *
-     * @param hid
+     * @param headlineAiDTO
      * @return
      */
     @PostMapping("/summary")
-    public Result summarize(Integer hid) {
+    public Result summarize(@RequestBody HeadlineAiDTO headlineAiDTO) {
 
-        log.info("需要总结的文章id:{}", hid);
+        log.info("需要总结的文章id:{}", headlineAiDTO.getHid());
 
-        Result result = headLineAIService.summarize(hid);
+        Result result = headLineAIService.summarize(headlineAiDTO);
         return result;
     }
 
     /**
      * 文章润色
      *
-     * @param hid
+     * @param headlineAiDTO
      * @return
      */
     @PostMapping("polish")
-    public Result polish(Integer hid) {
+    public Result polish(@RequestBody HeadlineAiDTO headlineAiDTO) {
 
-        log.info("需要润色文章id:{}", hid);
+        log.info("需要润色文章id:{}", headlineAiDTO.getHid());
 
-        Result result = headLineAIService.polish(hid);
+        Result result = headLineAIService.polish(headlineAiDTO);
         return result;
     }
 }

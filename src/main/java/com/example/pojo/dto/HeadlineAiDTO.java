@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class HeadlineAiDTO {
 
-    private String article;
+    private Integer hid;
 }
