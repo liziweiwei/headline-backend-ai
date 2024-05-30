@@ -5,6 +5,8 @@ server:
     context-path: /
 
 spring:
+  profiles:
+    active: dev
   # druid 连接池
   application:
     name: headline-backend-ai
@@ -19,12 +21,12 @@ spring:
   ai:
     openai:
       # 全局配置
-      api-key: sk-RDmvMXMyT5ttIUvN9e811a79F733484a83C5A204C0F7013a  # 申请的api-key
-      base-url: https://api.xty.app # openAi访问地址(国内代理)
+      api-key: ${headline.ai.openai.api-key}  # 申请的api-key
+      base-url: ${headline.ai.openai.base-url} # openAi访问地址(国内代理)
       # 聊天API配置
       chat:
-        api-key: sk-RDmvMXMyT5ttIUvN9e811a79F733484a83C5A204C0F7013a
-        base-url: https://api.xty.app
+        api-key: ${headline.ai.openai.chat.api-key}
+        base-url: ${headline.ai.openai.chat.base-url}
         options:
           model: gpt-3.5-turbo # 模型配置
           temperature: 0.7

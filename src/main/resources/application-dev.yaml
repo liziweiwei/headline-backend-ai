@@ -1,0 +1,12 @@
+headline:
+  ai:
+    openai:
+      # 全局配置
+      api-key: sk-RDmvMXMyT5ttIUvN9e811a79F733484a83C5A204C0F7013a  # 申请的api-key
+      base-url: https://api.xty.app # openAi访问地址(国内代理)
+      # 聊天API配置
+      chat:
+        api-key: sk-RDmvMXMyT5ttIUvN9e811a79F733484a83C5A204C0F7013a
+        base-url: https://api.xty.app
+
+
