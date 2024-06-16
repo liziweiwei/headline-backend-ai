@@ -5,19 +5,17 @@ server:
     context-path: /
 
 spring:
-  profiles:
-    active: dev
-  # druid 连接池
   application:
     name: headline-backend-ai
+  profiles:
+    active: dev
   datasource:
-    # 连接池类型
-    type: com.alibaba.druid.pool.DruidDataSource
-    druid:
-      url: jdbc:mysql://localhost:3306/headline-news
-      username: root
-      password: 123456
-      driver-class-name: com.mysql.cj.jdbc.Driver
+    # 连接池类型,druid 连接池
+    type: ${headline.datasource.type}
+    url: ${headline.datasource.url}
+    username: ${headline.datasource.username}
+    password: ${headline.datasource.password}
+    driver-class-name: ${headline.datasource.driver-class-name}
   ai:
     openai:
       # 全局配置
@@ -28,8 +26,8 @@ spring:
         api-key: ${headline.ai.openai.chat.api-key}
         base-url: ${headline.ai.openai.chat.base-url}
         options:
-          model: gpt-3.5-turbo # 模型配置
-          temperature: 0.7
+          model: ${headline.ai.openai.chat.options.model} # 模型配置
+          temperature: ${headline.ai.openai.chat.options.temperature}
 
 # mybatis-plus的配置
 mybatis-plus:
@@ -39,15 +37,7 @@ mybatis-plus:
       logic-delete-field: isDeleted  #全局逻辑删除 有默认值
       id-type: auto  # 主键策略自增长
       table-prefix: news_ # 设置表的前缀
-  # 详细输出sql语句和sql语句执行结果
-  #  configuration:
-  #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
-  # log4j日志的配置 需要导入lombok依赖
-  # 就是log4j的形式输出,而不是控制台打印了,并且只输出SQL语句,如果debug调高级别,SQL语句也可以不输出。
-  # 定义不同Java包的日志记录级别,输出简易日志信息
-  # 如果mapper层出现了问题,由于其日志级别设置为debug,开发者可以查看更详细的日志信息来定位问题
-  # 而对于service和controller层,使用info级别可以保持日志的清晰,同时记录足够的信息以供监控应用程序的运行情况
 logging:
   level:
     com:
@@ -58,5 +48,5 @@ logging:
 #jwt配置
 jwt:
   token:
-    tokenExpiration: 120 # 有效时间,单位分钟
-    tokenSignKey: headline123456  # 当前程序签名秘钥(自定义)
+    tokenExpiration: ${headline.jwt.token.tokenExpiration} # 有效时间,单位分钟
+    tokenSignKey: ${headline.jwt.token.tokenSignKey}  # 当前程序签名秘钥(自定义)

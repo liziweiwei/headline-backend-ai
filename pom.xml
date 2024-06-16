@@ -39,19 +39,20 @@
             <version>3.5.5</version>
         </dependency>
 
-        <!-- 数据库相关配置启动器 -->
+        <!-- 数据库相关配置启动器(多余, 已经包含在mybatis-plus中) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
 
-        <!-- druid启动器的依赖  -->
+        <!-- druid启动器的依赖 -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid-spring-boot-3-starter</artifactId>
             <version>1.2.21</version>
         </dependency>
-
+        
+        <!-- mysql驱动 -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
